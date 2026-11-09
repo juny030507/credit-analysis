@@ -4,12 +4,19 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 import EmptyState from './components/EmptyState'
+import { Link } from 'react-router'
 
 function App() {
   const [count, setCount] = useState(0)
   const [companyName, setCompanyName] = useState('')
-  const companies = ['삼성전자', '현대자동차', 'LG전자']
-  const filteredCompanies = companies.filter((company) => company.includes(companyName))
+  const companies = [
+    { name: '삼성전자', code: 'demo-1' },
+    { name: '현대자동차', code: 'demo-2' },
+    { name: 'LG전자', code: 'demo-3' },
+  ]
+  const filteredCompanies = companies.filter((company) =>
+    company.name.includes(companyName)
+  )
 
   return (
     <>
@@ -29,7 +36,11 @@ function App() {
 <p>입력한 기업명: {companyName}</p>
 <ul>
   {filteredCompanies.map((company) => (
-    <li key={company}>{company}</li>
+    <li key={company.code}>
+      <Link to={`/companies/${company.code}/financials`}>
+        {company.name}
+      </Link>
+    </li>
   ))}
 </ul>
 {filteredCompanies.length === 0 && (

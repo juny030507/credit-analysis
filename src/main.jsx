@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import NotesPage from './pages/NotePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import FinancialPage from './pages/FinancialPage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/notes" element={<NotesPage />} />
+        <Route path="/companies/:corpCode/financials" element={<FinancialPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
