@@ -7,6 +7,7 @@ import NotesPage from './pages/NotePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import FinancialPage from './pages/FinancialPage.jsx'
 import CashFlowPage from './pages/CashFlowPage.jsx'
+import NewNotePage from './pages/NewNotePage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/companies/:corpCode/financials" element={<FinancialPage />} />
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/companies/:corpCode/cash-flow" element={<CashFlowPage />} />
+        <Route path="/notes/new" element={<NewNotePage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
