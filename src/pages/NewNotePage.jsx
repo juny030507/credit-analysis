@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 function NewNotePage() {
   const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
   const [message, setMessage] = useState('')
 
   function handleSubmit(event) {
@@ -12,7 +13,12 @@ function NewNotePage() {
       return
     }
 
-    setMessage('제목이 확인됐어요. 저장 기능은 준비 중입니다.')
+    if (content.trim() === '') {
+      setMessage('분석 내용을 입력해 주세요.')
+      return
+    }
+
+    setMessage('입력 내용이 확인됐어요. 저장 기능은 준비 중입니다.')
   }
 
   return (
@@ -29,11 +35,21 @@ function NewNotePage() {
             setMessage('')
           }}
         />
+        <label htmlFor="content">분석 내용</label>
+        <textarea
+          id="content"
+          value={content}
+          onChange={(event) => {
+            setContent(event.target.value)
+            setMessage('')
+          }}
+        />
 
         <button type="submit">제출하기</button>
       </form>
 
       <p>입력한 제목: {title}</p>
+      <p>입력한 내용: {content}</p>
       {message && <p>{message}</p>}
     </main>
   )
