@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import FormField from '../components/FormField'
 
 function NewNotePage() {
   const [title, setTitle] = useState('')
@@ -26,15 +27,16 @@ function NewNotePage() {
       <h1>분석 노트 작성</h1>
 
       <form onSubmit={handleSubmit}>
-        <label htmlFor="title">제목</label>
-        <input
+        <FormField
           id="title"
+          label="제목"
           value={title}
           onChange={(event) => {
             setTitle(event.target.value)
             setMessage('')
           }}
         />
+
         <label htmlFor="content">분석 내용</label>
         <textarea
           id="content"
