@@ -70,3 +70,20 @@ export async function updateNote(noteId, title, content) {
 
   return data
 }
+
+export async function deleteNote(noteId) {
+  await ensureUser()
+
+  const { data, error } = await supabase
+    .from('analysis_notes')
+    .delete()
+    .eq('id', noteId)
+    .select('id')
+    .maybeSingle()
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}
