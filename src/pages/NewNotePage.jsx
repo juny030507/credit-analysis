@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import FormField from '../components/FormField'
+import { useNavigate } from 'react-router'
+import { createNote } from '../lib/notes'
 
 function NewNotePage() {
+  const navigate = useNavigate()
+  const [isSaving, setIsSaving] = useState(false)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [message, setMessage] = useState('')
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
 
     if (title.trim() === '') {
@@ -19,7 +23,18 @@ function NewNotePage() {
       return
     }
 
-    setMessage('입력 내용이 확인됐어요. 저장 기능은 준비 중입니다.')
+    setIsSaving(true)
+    setMessage('')
+
+    try {
+      const note = await createNote(title.trim(), content.trim())
+      navigate(`/notes/${note.id}`)
+    } catch (error) {
+      console.error(error)
+      setMessage('저장하지 못했습니다. 다시 시도해 주세요.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -47,7 +62,10 @@ function NewNotePage() {
           }}
         />
 
-        <button type="submit">제출하기</button>
+        <button type="submit" disabled={isSaving}>
+          {isSaving ? '저장 중...' : '제출하기'}
+        </button>
+        
       </form>
 
       <p>입력한 제목: {title}</p>
