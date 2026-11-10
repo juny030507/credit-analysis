@@ -50,3 +50,23 @@ export async function getNote(noteId) {
 
   return data
 }
+
+export async function updateNote(noteId, title, content) {
+  await ensureUser()
+
+  const { data, error } = await supabase
+    .from('analysis_notes')
+    .update({
+      title: title,
+      content: content,
+    })
+    .eq('id', noteId)
+    .select('id')
+    .maybeSingle()
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}
