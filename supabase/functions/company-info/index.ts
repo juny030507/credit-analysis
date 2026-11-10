@@ -12,6 +12,7 @@ Deno.serve(async () => {
   url.searchParams.set('crtfc_key', apiKey)
   url.searchParams.set('corp_code', '00126380')
 
+  let stage = 'fetch'
   try {
     const response = await fetch(url)
 
@@ -22,6 +23,7 @@ Deno.serve(async () => {
       )
     }
 
+    stage = 'parse'
     const data = await response.json()
 
     if (data.status !== '000') {
@@ -35,8 +37,11 @@ Deno.serve(async () => {
       corpCode: data.corp_code,
       corpName: data.corp_name,
     })
-  } catch {
-    console.error('OpenDART 요청 실패')
+  } catch (error) {
+    const name = error instanceof Error ? error.name : 'UnknownError'
+    const details = error instanceof Error ? `${error.message} ${String(error.cause ?? '')}` : ''
+    const handshake = /handshake/i.test(details)
+    console.error('OpenDART 요청 실패:', { stage, name, handshake })
     return Response.json(
       { error: '기업 정보를 가져오지 못했습니다.' },
       { status: 502 },
