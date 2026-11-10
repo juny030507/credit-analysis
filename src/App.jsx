@@ -5,6 +5,7 @@ import viteLogo from './assets/vite.svg'
 import './App.css'
 import EmptyState from './components/EmptyState'
 import { Link } from 'react-router'
+import CompanyInfo from './components/CompanyInfo'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -28,6 +29,7 @@ function App() {
         </div>
         <div>
           <h1>기업 신용분석 노트</h1>
+          <CompanyInfo />
           <input
             value={companyName}
             onChange={(event) => setCompanyName(event.target.value)}
