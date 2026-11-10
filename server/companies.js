@@ -1,7 +1,13 @@
 import { strFromU8, unzipSync } from 'fflate'
 import { XMLParser } from 'fast-xml-parser'
 
-export async function getCompanies() {
+let cachedCompanies = null
+let cachedAt = 0
+let pendingCompanies = null
+
+const CACHE_DURATION = 60 * 60 * 1000
+
+async function fetchCompanies() {
   const apiKey = process.env.OPENDART_API_KEY
 
   if (!apiKey) {
@@ -43,4 +49,28 @@ export async function getCompanies() {
       corpCode: company.corp_code,
       stockCode: company.stock_code,
     }))
+}
+
+export async function getCompanies() {
+  const cacheIsFresh =
+    cachedCompanies !== null &&
+    Date.now() - cachedAt < CACHE_DURATION
+
+  if (cacheIsFresh) {
+    return cachedCompanies
+  }
+
+  if (!pendingCompanies) {
+    pendingCompanies = fetchCompanies()
+      .then((companies) => {
+        cachedCompanies = companies
+        cachedAt = Date.now()
+        return companies
+      })
+      .finally(() => {
+        pendingCompanies = null
+      })
+  }
+
+  return pendingCompanies
 }
