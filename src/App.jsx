@@ -1,20 +1,54 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 import EmptyState from './components/EmptyState'
 import { Link } from 'react-router'
-import CompanyInfo from './components/CompanyInfo'
 
 function App() {
   const [count, setCount] = useState(0)
   const [companyName, setCompanyName] = useState('')
-  const companies = [
-    { name: '삼성전자', code: 'demo-1' },
-    { name: '현대자동차', code: 'demo-2' },
-    { name: 'LG전자', code: 'demo-3' },
-  ]
+  const [companies, setCompanies] = useState([])
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true)
+  const [companiesError, setCompaniesError] = useState('')
+
+  useEffect(() => {
+    let isActive = true
+
+    async function loadCompanies() {
+      try {
+        const response = await fetch('/api/companies')
+
+        if (!response.ok) {
+          throw new Error('기업 목록 요청 실패')
+        }
+
+        const data = await response.json()
+
+        if (isActive) {
+          setCompanies(data)
+        }
+      } catch (error) {
+        console.error(error)
+
+        if (isActive) {
+          setCompaniesError('기업 목록을 불러오지 못했습니다.')
+        }
+      } finally {
+        if (isActive) {
+          setIsLoadingCompanies(false)
+        }
+      }
+    }
+
+    loadCompanies()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
   const filteredCompanies = companies.filter((company) =>
     company.name.includes(companyName)
   )
@@ -29,24 +63,44 @@ function App() {
         </div>
         <div>
           <h1>기업 신용분석 노트</h1>
-          <CompanyInfo />
           <input
             value={companyName}
             onChange={(event) => setCompanyName(event.target.value)}
             placeholder="기업명을 입력하세요"
 />
 <p>입력한 기업명: {companyName}</p>
-<ul>
-  {filteredCompanies.map((company) => (
-    <li key={company.code}>
-      <Link to={`/companies/${company.code}/financials`}>
-        {company.name}
-      </Link>
-    </li>
-  ))}
-</ul>
-{filteredCompanies.length === 0 && (
-  <EmptyState message="검색 결과가 없습니다." />
+{isLoadingCompanies && <p>기업 목록을 불러오는 중입니다...</p>}
+
+{companiesError && <p>{companiesError}</p>}
+
+{!isLoadingCompanies && !companiesError && companyName.trim() === '' && (
+  <p>기업명을 입력해 검색해 주세요.</p>
+)}
+
+{!isLoadingCompanies && !companiesError && companyName.trim() !== '' && (
+  <>
+    {filteredCompanies.length === 0 ? (
+      <EmptyState message="검색 결과가 없습니다." />
+    ) : (
+      <>
+        <p>검색 결과: {filteredCompanies.length}개</p>
+
+        <ul>
+          {filteredCompanies.slice(0, 20).map((company) => (
+            <li key={company.corpCode}>
+              <Link to={`/companies/${company.corpCode}/financials`}>
+                {company.name} ({company.stockCode})
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {filteredCompanies.length > 20 && (
+          <p>처음 20개를 보여 주고 있어요. 기업명을 더 입력해 주세요.</p>
+        )}
+      </>
+    )}
+  </>
 )}
           <p>
             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
