@@ -34,3 +34,19 @@ export async function getNotes() {
 
   return data
 }
+
+export async function getNote(noteId) {
+  await ensureUser()
+
+  const { data, error } = await supabase
+    .from('analysis_notes')
+    .select('id, title, content, created_at')
+    .eq('id', noteId)
+    .maybeSingle()
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}
