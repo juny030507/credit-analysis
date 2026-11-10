@@ -1,7 +1,47 @@
 import { createServer } from 'node:http'
 import { getCompanies } from './companies.js'
+import { getFinancials } from './financials.js'
 
 const server = createServer(async (request, response) => {
+    const requestUrl = new URL(request.url, 'http://localhost')
+    if (requestUrl.pathname === '/api/financials') {
+        const corpCode = requestUrl.searchParams.get('corpCode')
+        const year = requestUrl.searchParams.get('year')
+
+        const validCorpCode = /^\d{8}$/.test(corpCode ?? '')
+        const validYear =
+          /^\d{4}$/.test(year ?? '') &&
+          Number(year) >= 2015 &&
+          Number(year) <= new Date().getFullYear()
+
+        if (!validCorpCode || !validYear) {
+          response.writeHead(400, {
+            'Content-Type': 'application/json; charset=utf-8',
+          })
+          response.end(JSON.stringify({
+            error: '기업번호 또는 사업연도를 확인해 주세요.',
+          }))
+          return
+        }
+
+        try {
+          const result = await getFinancials(corpCode, year)
+
+          response.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+          })
+          response.end(JSON.stringify(result))
+        } catch {
+          response.writeHead(502, {
+            'Content-Type': 'application/json; charset=utf-8',
+          })
+          response.end(JSON.stringify({
+            error: '재무제표를 가져오지 못했습니다.',
+          }))
+        }
+
+        return
+      }
     if (request.url === '/api/companies') {
     try {
       const companies = await getCompanies()
