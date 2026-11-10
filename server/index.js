@@ -1,6 +1,26 @@
 import { createServer } from 'node:http'
+import { getCompanies } from './companies.js'
 
 const server = createServer(async (request, response) => {
+    if (request.url === '/api/companies') {
+    try {
+      const companies = await getCompanies()
+
+      response.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+      })
+      response.end(JSON.stringify(companies))
+    } catch {
+      response.writeHead(502, {
+        'Content-Type': 'application/json; charset=utf-8',
+      })
+      response.end(JSON.stringify({
+        error: '기업 목록을 가져오지 못했습니다.',
+      }))
+    }
+
+    return
+  }
   if (request.url !== '/api/company-info') {
     response.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' })
     response.end(JSON.stringify({ error: '주소를 찾을 수 없습니다.' }))
