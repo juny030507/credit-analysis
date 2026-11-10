@@ -19,3 +19,18 @@ export async function createNote(title, content) {
 
   return data
 }
+
+export async function getNotes() {
+  await ensureUser()
+
+  const { data, error } = await supabase
+    .from('analysis_notes')
+    .select('id, title, created_at')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}

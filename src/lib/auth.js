@@ -1,6 +1,8 @@
 import { supabase } from './supabase'
 
-export async function ensureUser() {
+let pendingUser = null
+
+async function findOrCreateUser() {
   const { data: sessionData, error: sessionError } =
     await supabase.auth.getSession()
 
@@ -19,4 +21,16 @@ export async function ensureUser() {
   }
 
   return data.user
+}
+
+export async function ensureUser() {
+  if (!pendingUser) {
+    pendingUser = findOrCreateUser()
+  }
+
+  try {
+    return await pendingUser
+  } finally {
+    pendingUser = null
+  }
 }
